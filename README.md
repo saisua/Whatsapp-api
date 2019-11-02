@@ -1,2 +1,2 @@
-# Whatsapp-api
-My own watsapp api
+# Whatsapp web-api
+My own watsapp web api
