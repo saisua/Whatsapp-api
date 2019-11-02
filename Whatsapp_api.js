@@ -1,4 +1,4 @@
-﻿// Send 
+﻿	// Send 
 	var input = get_input();
 function send_message(text, times=1){
 	for (var a = 0; a < times; a++){setTimeout(function(){
@@ -65,6 +65,7 @@ function remove(message, for_everyone=true)
 	*/
 }
 
+/*
 function private_remove(element){
 	var node = document.createElement("div"); node.setAttribute("class", "_2eK7W _23_1v"), node.setAttribute("role","button");
 	node.onclick = function() {
@@ -78,6 +79,7 @@ function private_remove(element){
 	};
 	node.click = function(){};
 }
+*/
 
 /*<div class="_3EQsG _15CAo" style="opacity: 1;">
 <div data-js-context-icon="true" class="_2-qoA" style="transform: translateX(0%);">
@@ -87,19 +89,25 @@ function private_remove(element){
 </path></svg></span></div></div>
 */
 
+// Global definition of messageSelector
+window.messageSelector = {"text":"_12pGw",
+							"emoji":"_12pGw EopGb",
+							"image":"_3mdDl'] img[class='_18vxA",
+							"audio":"uqRgA _38Akx'] div[class='TeXXU'] audio"}; 
 
-
+//probably i can differentiate photo from audio							
+							
 // Foto = '_2I4z2'
 // Sticker = '_2I4z2 _2W3Ap'?
-function last_message(num=1){
+function last_message(num=1){	
 	if(num<1){return;}
-	var messages = Array.from(document.querySelectorAll("[class='_12pGw'],[class='_12pGw EopGb']"));
+	var messages = Array.from(document.querySelectorAll("[class='"+Object.values(messageSelector).join("'],[class='")));
 	var len_ = messages.length;
 	var len_before = 0;
 	while(num > len_ && len_before != len_){
 		len_before = len_;
 		messages[0].scrollIntoView();
-		messages = Array.from(document.querySelectorAll("[class='_12pGw'],[class='_12pGw EopGb']"));
+		messages = Array.from(document.querySelectorAll("[class='"+Object.values(messageSelector).join("'],[class='")));
 		len_ = messages.length;
 	}
 	return messages[len_-num];
@@ -109,16 +117,19 @@ function last_message(num=1){
 function message_to_string(message){
 	var text = "";
 	var emojis = Array.from(message.querySelectorAll("img"));
+	
 	for(var emoji_num = 0; emoji_num < emojis.length; emoji_num++){
 		text += emojis[emoji_num].getAttribute("data-plain-text");
 	}
-	if(message.className == "_12pGw EopGb"){
+	if(message.className == messageSelector["emoji"]){
 		text += message.innerText;
+	}else if(message.tagName == "IMG"){
+		text += "[image: "+message.src+" ]";
+	}else if(message.tagName == "AUDIO"){
+		text += "[audio: "+message.src+" ]";
 	}
 	return text;
 }
-
-
 
 // reply_dict {in_message : [function, [param]]}
 function answer(message, reply_dict, do_not_found=[function(){}], return_on_answer=true){
@@ -158,5 +169,18 @@ function check_if_answer(reply_dict, return_on_answer=true, miliseconds=1000, do
 	console.log("or run 'clearInterval(checking);'")
 }
 
-/*{"🤠":[send_message, ["Yiiiiihaaa!"]],"❤":[send_message, ["Coret"]],"♥":[send_message, ["Coret"]]}
+// save to local file or new tab
+function store(text, name, local=false, type="text/plain") {
+  var a = document.createElement("a");
+  if(Array.isArray(text)){text = text.join("\n")}
+  var file = new Blob([text], {type: type});
+  a.href = URL.createObjectURL(file);
+  if(local){
+	a.download = name;
+	a.click();
+  }		
+  else{window.open(a.href,'_blank');}
+}
+
+/*{"🤠":[send_message, ["Yiiiiihaaa!"]],"❤":[send_message, ["Coret"]],"♥":[send_message, [	"Coret"]]}
 */
