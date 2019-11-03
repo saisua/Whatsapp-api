@@ -166,7 +166,7 @@ function index(message, max_find=10){
 }
 
 // Check and answer
-function check_if_answer(reply_dict, return_on_answer=true, miliseconds=1000, do_not_found=[function(){},[]]){
+function check_if_answer(reply_dict={}, return_on_answer=true, miliseconds=1000, do_not_found=[function(){},[]]){
 	var lmess = last_message();
 	var aux = null;
 	window.check = setInterval(function(){
@@ -174,7 +174,7 @@ function check_if_answer(reply_dict, return_on_answer=true, miliseconds=1000, do
 		if(lmess != aux){
 			var aux_index = index(aux);
 			if(aux_index === null){aux=lmess; return;}
-			for(counter = aux_index; counter > 1; counter--){
+			for(counter = aux_index; counter > 0; counter--){
 				console.log("message detected = " + message_to_string(last_message(counter)));
 				answer(lmess, reply_dict, do_not_found, return_on_answer);
 			}
