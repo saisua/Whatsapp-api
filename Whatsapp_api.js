@@ -1,10 +1,10 @@
 ﻿	// Send 
-	var input = get_input();
 function send_message(text, times=1){
 	if(Array.isArray(text)){
-		for(mes in text){send_message(mes, times);
-		return;}
+		for(mes=0;mes < text.length; mes++){send_message(text[mes], times);}
+		return;
 	}
+	var input = get_input();
 	for (var a = 0; a < times; a++){setTimeout(function(){
         input.innerHTML = text;
         input.dispatchEvent(new Event('input', {bubbles: true}));
@@ -175,7 +175,7 @@ function check_if_answer(reply_dict, return_on_answer=true, miliseconds=1000, do
 			var aux_index = index(aux);
 			if(aux_index === null){aux=lmess; return;}
 			for(counter = aux_index; counter > 1; counter--){
-				console.log("message detected = " + message_to_string(lmess));
+				console.log("message detected = " + message_to_string(last_message(counter)));
 				answer(lmess, reply_dict, do_not_found, return_on_answer);
 			}
 			aux = lmess;
