@@ -1,6 +1,10 @@
 ﻿	// Send 
 	var input = get_input();
 function send_message(text, times=1){
+	if(Array.isArray(text)){
+		for(mes in text){send_message(mes, times);
+		return;}
+	}
 	for (var a = 0; a < times; a++){setTimeout(function(){
         input.innerHTML = text;
         input.dispatchEvent(new Event('input', {bubbles: true}));
@@ -95,10 +99,7 @@ window.messageSelector = {"text":"_12pGw",
 							"image":"_3mdDl'] img[class='_18vxA",
 							"audio":"uqRgA _38Akx'] div[class='TeXXU'] audio"}; 
 
-//probably i can differentiate photo from audio							
-							
-// Foto = '_2I4z2'
-// Sticker = '_2I4z2 _2W3Ap'?
+// get last chat message
 function last_message(num=1){	
 	if(num<1){return;}
 	var messages = Array.from(document.querySelectorAll("[class='"+Object.values(messageSelector).join("'],[class='")));
@@ -152,16 +153,32 @@ function answer(message, reply_dict, do_not_found=[function(){}], return_on_answ
 	}
 }
 
+// returns the number of message in the chat
+function index(message, max_find=10){
+	if(message === null){return null;}
+	else if(typeof message != 'string'){message = message_to_string(message);}
+	var num = 1;
+	while(num < max_find){
+		if(message == message_to_string(last_message(num))){return num;}
+		num++;
+	}
+	return null;
+}
+
 // Check and answer
 function check_if_answer(reply_dict, return_on_answer=true, miliseconds=1000, do_not_found=[function(){},[]]){
-	var lmess = message_to_string(last_message());
-	var aux = "0";
+	var lmess = last_message();
+	var aux = null;
 	window.check = setInterval(function(){
-		lmess = message_to_string(last_message());
+		lmess = last_message();
 		if(lmess != aux){
-			console.log("message detected = " + lmess);
+			var aux_index = index(aux);
+			if(aux_index === null){aux=lmess; return;}
+			for(counter = aux_index; counter > 1; counter--){
+				console.log("message detected = " + message_to_string(lmess));
+				answer(lmess, reply_dict, do_not_found, return_on_answer);
+			}
 			aux = lmess;
-			answer(lmess, reply_dict, do_not_found, return_on_answer);
 		}
 	}, miliseconds);
 	document.addEventListener("keydown", function(event){if(event.which==27){clearInterval(check);console.log("check stopped");};}); 
@@ -181,6 +198,7 @@ function store(text, name, local=false, type="text/plain") {
   }		
   else{window.open(a.href,'_blank');}
 }
+
 
 /*{"🤠":[send_message, ["Yiiiiihaaa!"]],"❤":[send_message, ["Coret"]],"♥":[send_message, [	"Coret"]]}
 */
