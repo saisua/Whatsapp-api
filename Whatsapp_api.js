@@ -11,7 +11,7 @@ function send_message(text, times=1, selfdestruct=false){
 		var button = get_button();
         button.click();
 		last = last_message();
-		if(selfdestruct){setInterval(function(){if(seen(last)){delete_message(last);}},2)}}
+		if(selfdestruct){setInterval(function(){if(seen(last)){delete_message(last);}},2000)}}
 	,1000);}
 }
 
@@ -132,7 +132,7 @@ function index(message, max_find=10){
 	return null;
 }
 
-function seen(){return true;}
+function seen(message){return message.parentNode.parentNode.querySelector("span[data-icon='msg-dblcheck-ack']") != null;}
 
 // Check and answer
 function check_if_answer(reply_dict={}, return_on_answer=true, miliseconds=1000, do_not_found=[function(){},[]],
