@@ -1,19 +1,30 @@
-﻿	// Send 
+// Send 
 function send_message(text, times=1, selfdestruct=false){
 	if(Array.isArray(text)){
 		for(mes=0;mes < text.length; mes++){send_message(text[mes], times);}
 		return;
 	}
 	var input = get_input();
-	for (var a = 0; a < times; a++){setTimeout(function(){
+	for (counter = 0; counter < times; counter++){setTimeout(function(){
         input.innerHTML = text;
         input.dispatchEvent(new Event('input', {bubbles: true}));
 		var button = get_button();
         button.click();
-		last = last_message();
-		if(selfdestruct){setInterval(function(){if(seen(last)){delete_message(last);}},2000)}}
-	,1000);}
+    },1);}
+    
+    if(selfdestruct){
+        setTimeout(function(){
+	    var sent = [];
+            for(counter = 1; counter <= times; counter++){sent.push(last_message(counter));}
+            
+            console.log(sent);
+            console.log(seen(sent[0]));
+            
+            setInterval(function(){if(seen(sent[0])){delete_message(sent);}},10000);
+        },500*times);
+    }
 }
+
 
 function get_input(){
 	return document.querySelector("div[contenteditable='true']");
@@ -199,12 +210,14 @@ function date_str(date=new Date()){return date.getDate()+'/'+date.getMonth()+" @
 		
 function sleep(ms){return new Promise(resolve => setTimeout(resolve, ms));}
 
-async function delete_message(messages, only_for_me=false){
-	if(Array.isArray(messages)){
-		for(message=0;message<messages.length;message++){delete_message(message);}
-		return;
-	}
+function delete_message(messages, only_for_me=false){
 	var canvas = document.querySelector("div[class='_1_keJ']");
+    
+    if(canvas == null){
+            setTimeout(delete_message(messages, only_for_me),Math.random()*400+100); return;
+    }
+    console.log("Canvas!");
+    
 	var event = canvas.ownerDocument.createEvent('MouseEvents');
 	
 	event.initMouseEvent('contextmenu', true, true, canvas.ownerDocument.defaultView,1,0,0,0,0,false,
@@ -213,15 +226,20 @@ async function delete_message(messages, only_for_me=false){
 	!canvas.dispatchEvent(event);
 	
 	document.querySelector("li[class='_3cfBY _2yhpw _3BqnP'] div[title='Select messages']").click();
-	await sleep(1);							
+	setTimeout(function(){						
 	var selectables = document.querySelectorAll("div[class='qTFAl']");
-	selectables[selectables.length-index(messages)].click();
+	if(Array.isArray(messages)){
+        console.log("holaa");
+		for(message=0;message<messages.length;message++){selectables[selectables.length-index(message)].click();}
+	}else{selectables[selectables.length-index(messages)].click();}
+    console.log("Adeeu");
 	document.querySelector("button[class='_1wRbe'][title='Delete message']").click();
 	var for_everyone = document.evaluate("//div[text()='Delete for everyone']",document,null,XPathResult.ANY_TYPE, null).iterateNext();
 	if(for_everyone && !only_for_me){
 		for_everyone.click();
 		document.querySelector("div[class='_2eK7W _3PQ7V']").click();
-	}else{document.evaluate("//div[text()='Delete for me']",document,null,XPathResult.ANY_TYPE, null).iterateNext().click();}
+	}else{document.evaluate("//div[text()='Delete for me']",document,null,XPathResult.ANY_TYPE, null).iterateNext().click();}},20);
 }
 /*{"🤠":[send_message, ["Yiiiiihaaa!"]],"❤":[send_message, ["Coret"]],"♥":[send_message, [	"Coret"]]}
 */
+
