@@ -1,5 +1,5 @@
 // Send 
-function send_message(text, times=1, selfdestruct=false){
+function send_message(text, times=1, mention_num=false, selfdestruct=false){
 	if(Array.isArray(text)){
 		for(mes=0;mes < text.length; mes++){send_message(text[mes], times);}
 		return;
@@ -8,20 +8,22 @@ function send_message(text, times=1, selfdestruct=false){
 	for (counter = 0; counter < times; counter++){setTimeout(function(){
         input.innerHTML = text;
         input.dispatchEvent(new Event('input', {bubbles: true}));
+		if(mention_num){number_to_mention(mention_num);}
 		var button = get_button();
-        button.click();
+		button.click();
     },1);}
     
     if(selfdestruct){
         setTimeout(function(){
-	    var sent = [];
-            for(counter = 1; counter <= times; counter++){sent.push(last_message(counter));}
+	    var sent_messages = [];
+            for(counter = 1; counter <= times; counter++){sent_messages.push(last_message(counter));}
             
-            console.log(sent);
-            console.log(seen(sent[0]));
-            
-            setInterval(function(){if(seen(sent[0])){delete_message(sent);}},10000);
-        },500*times);
+            var interval = setInterval(function(){
+				if(seen(sent_messages[0])&&sent(sent_messages[sent_messages.length-1])){
+					delete_message(sent_messages);
+					clearInterval(interval);
+				}},3000);
+        },700*times);
     }
 }
 
@@ -59,7 +61,7 @@ function send_at(text, timedate=create_date(), send_times=1){
 
 // Mention
 // Num example: 34012345678
-function number_to_mention(input, num, nom="Easteregg"){
+function number_to_mention(num, nom="Easteregg", input=get_input()){
 	var numid = num.toString(); numid += "@c.us";
 	var node1 = document.createElement("span"); node1.setAttribute("class","at-symbol"); node1.innerText = "@";
 	var node2 = document.createElement("span"); node2.dir = "ltr"; node2.innerText = nom; 
@@ -134,16 +136,25 @@ function answer(message, reply_dict, do_not_found=[function(){}], return_on_answ
 // returns the number of message in the chat
 function index(message, max_find=10){
 	if(message === null){return null;}
-	else if(typeof message != 'string'){message = message_to_string(message);}
 	var num = 1;
 	while(num < max_find){
-		if(message == message_to_string(last_message(num))){return num;}
+		if(message == last_message(num)){return num;}
 		num++;
 	}
 	return null;
 }
 
-function seen(message){return message.parentNode.parentNode.querySelector("span[data-icon='msg-dblcheck-ack']") != null;}
+function sent(message){
+	try{
+		return message.parentNode.parentNode.querySelector("span[data-icon='msg-time']") == null;
+	}catch(_){}
+}
+
+function seen(message){
+	try{
+		return message.parentNode.parentNode.querySelector("span[data-icon='msg-dblcheck-ack']") != null;
+	}catch(_){}
+}
 
 // Check and answer
 function check_if_answer(reply_dict={}, return_on_answer=true, miliseconds=1000, do_not_found=[function(){},[]],
@@ -212,34 +223,40 @@ function sleep(ms){return new Promise(resolve => setTimeout(resolve, ms));}
 
 function delete_message(messages, only_for_me=false){
 	var canvas = document.querySelector("div[class='_1_keJ']");
-    
-    if(canvas == null){
-            setTimeout(delete_message(messages, only_for_me),Math.random()*400+100); return;
+	
+	var messages_index = [];
+	if(Array.isArray(messages)){
+		for(message=0;message<messages.length;message++){messages_index.push(index(messages[message],message+5));}
+	}else{messages_index.push(index(messages));}
+	
+	if(canvas == null){
+		try{
+			if(messages[Math.min.apply(null,messages_index)].parentNode.parentNode.parentNode == null){return;}
+		}catch(error){return;}
+		setTimeout(delete_message(messages, only_for_me),Math.random()*400+100); return;
     }
-    console.log("Canvas!");
-    
+
 	var event = canvas.ownerDocument.createEvent('MouseEvents');
 	
 	event.initMouseEvent('contextmenu', true, true, canvas.ownerDocument.defaultView,1,0,0,0,0,false,
 						false,false,false,2,null);
-						
+	
 	!canvas.dispatchEvent(event);
 	
 	document.querySelector("li[class='_3cfBY _2yhpw _3BqnP'] div[title='Select messages']").click();
 	setTimeout(function(){						
-	var selectables = document.querySelectorAll("div[class='qTFAl']");
-	if(Array.isArray(messages)){
-        console.log("holaa");
-		for(message=0;message<messages.length;message++){selectables[selectables.length-index(message)].click();}
-	}else{selectables[selectables.length-index(messages)].click();}
-    console.log("Adeeu");
-	document.querySelector("button[class='_1wRbe'][title='Delete message']").click();
-	var for_everyone = document.evaluate("//div[text()='Delete for everyone']",document,null,XPathResult.ANY_TYPE, null).iterateNext();
-	if(for_everyone && !only_for_me){
-		for_everyone.click();
-		document.querySelector("div[class='_2eK7W _3PQ7V']").click();
-	}else{document.evaluate("//div[text()='Delete for me']",document,null,XPathResult.ANY_TYPE, null).iterateNext().click();}},20);
+		var selectables = document.querySelectorAll("div[class='qTFAl']");
+
+		for(message=0;message<messages_index.length;message++){selectables[selectables.length-messages_index[message]].click();}
+
+		(document.querySelector("button[claxss='_1wRbe'][title='Delete message']")||document.querySelector("button[class='_1wRbe'][title='Delete messages']")).click();
+
+		var for_everyone = document.evaluate("//div[text()='Delete for everyone']",document,null,XPathResult.ANY_TYPE, null).iterateNext();
+		if(for_everyone && !only_for_me){
+			for_everyone.click();
+			var ok = document.querySelector("div[class='_2eK7W _3PQ7V']");
+			if(ok){ok.click();}
+		}else{document.evaluate("//div[text()='Delete for me']",document,null,XPathResult.ANY_TYPE, null).iterateNext().click();}},100);
 }
 /*{"🤠":[send_message, ["Yiiiiihaaa!"]],"❤":[send_message, ["Coret"]],"♥":[send_message, [	"Coret"]]}
 */
-
