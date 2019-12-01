@@ -258,5 +258,53 @@ function delete_message(messages, only_for_me=false){
 			if(ok){ok.click();}
 		}else{document.evaluate("//div[text()='Delete for me']",document,null,XPathResult.ANY_TYPE, null).iterateNext().click();}},100);
 }
+
+function bounds(element){
+	var box = element.getBoundingClientRect();
+
+	console.log(box.left, box.right);
+	console.log(box.top, box.bottom);
+}
+
+// Not working properly
+function get_side_chats(num = 1){
+	var scroll_ = document.querySelector("div[class='_1c8mz _1RYPC'][id='pane-side']");	
+
+	scroll_.scroll(0,0);
+	
+	var chats = new Set(scroll_.querySelectorAll("div[class='X7YrQ'] div[class='_2WP9Q']"));
+	var chats_size = chats.size;
+
+	var sizey = scroll_.querySelector("div[class='X7YrQ']").style.height;
+	sizey = parseInt(sizey.substring(sizey.length-2,0));
+	
+	var last_size = 0;
+
+	for(chat of chats.values()){
+		console.log(
+			chat.querySelector("div[class='KgevS'] span[class='_19RFN _1ovWX _F7Vk']").getAttribute("title") + 
+			" (" + chat.querySelector("div[class='_0LqQ']").innerText + ")  '" + 
+			chat.querySelector("div[class='xD91K'] span[class='_1Wn_k']").getAttribute("title")+"'");
+	}
+
+	while(last_size != chats.size && chats.size < num){
+		scroll_.scroll(0,sizey*chats.size);
+		var chats = new Set(document.querySelectorAll("div[class='X7YrQ'] div[class='_2WP9Q']"));
+
+		last_size = chats_size;
+
+		chats_size += chats.size;
+
+		for(chat of chats.values()){
+			console.log(
+			chat.querySelector("div[class='KgevS'] span[class='_19RFN _1ovWX _F7Vk']").getAttribute("title") + 
+			" (" + chat.querySelector("div[class='_0LqQ']").innerText + ")  '" + 
+			chat.querySelector("div[class='xD91K'] span[class='_1Wn_k']").getAttribute("title")+"'");
+		}
+	}
+
+	console.log("\nPrinted " + chats.size + " chats.")
+}
+
 /*{"🤠":[send_message, ["Yiiiiihaaa!"]],"❤":[send_message, ["Coret"]],"♥":[send_message, [	"Coret"]]}
 */
