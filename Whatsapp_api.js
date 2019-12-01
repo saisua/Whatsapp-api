@@ -102,7 +102,7 @@ function message_to_string(message){
 	for(var emoji_num = 0; emoji_num < emojis.length; emoji_num++){
 		text += emojis[emoji_num].getAttribute("data-plain-text");
 	}
-	if(message.className == messageSelector["emoji"]){
+	if(message.className == messageSelector["text"]){
 		text += message.innerText;
 	}else if(message.tagName == "IMG"){
 		text += "[image: "+message.src+" ]";
@@ -249,7 +249,7 @@ function delete_message(messages, only_for_me=false){
 
 		for(message=0;message<messages_index.length;message++){selectables[selectables.length-messages_index[message]].click();}
 
-		(document.querySelector("button[claxss='_1wRbe'][title='Delete message']")||document.querySelector("button[class='_1wRbe'][title='Delete messages']")).click();
+		(document.querySelector("button[class='_1wRbe'][title='Delete message']")||document.querySelector("button[class='_1wRbe'][title='Delete messages']")).click();
 
 		var for_everyone = document.evaluate("//div[text()='Delete for everyone']",document,null,XPathResult.ANY_TYPE, null).iterateNext();
 		if(for_everyone && !only_for_me){
