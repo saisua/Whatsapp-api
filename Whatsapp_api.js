@@ -196,7 +196,7 @@ function check_if_connected(show_time=true, print=true){
 // save to local file or new tab
 function store(text, name, local=false, type="text/plain") {
   var a = document.createElement("a");
-  if(Array.isArray(text)){text = text.join("\n")}
+  if(Array.isArray(text)){text = text.filter(function(e){return e}).join("\n")}
   var file = new Blob([text], {type: type});
   a.href = URL.createObjectURL(file);
   if(local){
